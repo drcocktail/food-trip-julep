@@ -21,8 +21,8 @@ To run this project, you need Python 3 and a few API keys. The setup script will
 ### 1. Clone the Repository
 
 ```bash
-git clone <repository_url>
-cd <repository_directory>
+git clone https://github.com/drcocktail/food-trip-julep
+cd food-trip-julep
 ```
 
 ### 2. Install Dependencies
