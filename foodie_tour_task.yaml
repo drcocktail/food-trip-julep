@@ -1,0 +1,85 @@
+name: Foodie Tour Task - Simplified
+description: A Julep agent that creates a one-day foodie tour for a list of cities, based on weather conditions and a search for iconic restaurants.
+
+input_schema:
+  type: object
+  properties:
+    locations:
+      type: array
+      items:
+        type: string
+      description: A list of city names to generate foodie tours for.
+
+tools:
+  - name: weather
+    type: integration
+    integration:
+      provider: weather
+      setup:
+        openweathermap_api_key: "${env.OPENWEATHERMAP_API_KEY}"
+
+  - name: internet_search
+    type: integration
+    integration:
+      provider: brave
+      setup:
+        brave_api_key: "${env.BRAVE_API_KEY}"
+
+main:
+  # Step 1: Get weather for all cities in parallel.
+  - over: $ steps[0].input.locations
+    map:
+      tool: weather
+      arguments:
+        location: $ _
+    
+  # Step 2: Get iconic restaurants for each city in parallel.
+  - over: $ steps[0].input.locations
+    map:
+      tool: internet_search
+      arguments:
+        query: $ f'top iconic foodie spots and restaurants in {_}'
+
+  # Step 3: Combine weather and restaurant search results for each city.
+  - evaluate:
+      zipped_data: |-
+        $ list(
+          zip(
+            steps[0].output,
+            steps[1].output
+          )
+        )
+
+  # Step 4: Generate the final, narrative foodie tour for each city.
+  - over: $ _['zipped_data']
+    parallelism: 3
+    map:
+      prompt:
+        - role: system
+          content: >-
+            You are a master storyteller and foodie guide. Your task is to create a delightful 
+            one-day "foodie tour" narrative for a given city.
+            
+            You will be provided with:
+            - The current weather data.
+            - A list of search results for iconic local foodie spots and restaurants.
+
+            Your response must:
+            - Weave a fun, engaging narrative for a full day (breakfast, lunch, dinner).
+            - Explicitly reference the weather and explain how it influences the dining choices.
+            - From the search results, identify 3 iconic dishes and assign one to each meal.
+            - Use the restaurant search results to suggest specific places to try each dish.
+            - Format the output clearly with headings for each city and meal.
+        - role: user
+          content: >-
+            $ f'''
+            City: "{_[0]['location']}"
+            Weather: "{_[0]['result']}"
+            Iconic Foodie Spot Search Results: "{_[1]}"
+            '''
+      unwrap: true
+
+  # Step 5: Format the final output into a single string.
+  - evaluate:
+      final_plan: |-
+        $ '\\n\\n==================================================\\n\\n'.join(itinerary for itinerary in _) 

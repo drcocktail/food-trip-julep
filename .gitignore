@@ -1,0 +1,4 @@
+.env
+minimal_test/
+trip_planner_test/
+test.ipynb

@@ -1,0 +1,20 @@
+# Copy this file to .env and fill in your API keys
+
+# Julep API Configuration (Required)
+JULEP_API_KEY=
+
+# OpenWeatherMap API Key (Optional - for real weather data)
+# Get a free key at: https://openweathermap.org/api
+# Free tier: 1000 calls/day
+OPENWEATHERMAP_API_KEY=
+
+# Brave API Key (Optional - for Brave Search)
+# Get a free key at: https://brave.com/brave-rewards/
+# Free tier: 1000 calls/day
+BRAVE_API_KEY=
+
+# Google API Key (Optional - for Google Maps and Places)
+# Bing Search API Key (Optional - for enhanced restaurant search)
+# Get a free key at: https://www.microsoft.com/en-us/bing/apis/bing-web-search-api
+# Free tier: 1000 calls/month (no credit card required for free tier)
+BING_SEARCH_API_KEY=your_bing_search_api_key_here 
